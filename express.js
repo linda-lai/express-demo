@@ -14,7 +14,7 @@ const courses = [
     { id: 1, name: "Spanish 101" },
     { id: 2, name: "Introduction to Film" },
     { id: 3, name: "Social Psychology" },
-    { id: 4, name: "Advanced Criminal Law"}
+    { id: 4, name: "Advanced Criminal Law"},
     { id: 5, name: "Football, Feminism and You"}
 ];
 
@@ -52,21 +52,9 @@ app.get('/api/courses/:id', (req, res) => {
 // 'POST' REQUEST - NEW COURSE
 // To post a new course into the object array
 app.post('/api/courses', (req, res) => {
-    // Define a schema for shape of course objects
-    const schema = {
-        name: Joi.string().min(3).required()
-    };
-
-    const result = Joi.validate(req.body, schema)
-    // VALIDATION WITHOUT JOI
-    // if (!req.body.name || req.body.name.length < 3) {
-    //     res.status(400).send('Name is required and should be a minimum of 3 characters.')
-    //     return;
-    // }
-
-    // VALIDATION WITH JOI
-    if (result.error) {
-        res.status(400).send(result.error.details[0].message)
+    const { error } = validateCourse(req.body)
+    if (error) {
+        res.status(400).send(error.details[0].message)
         return;
     }
 
@@ -83,20 +71,18 @@ app.post('/api/courses', (req, res) => {
 // -----------------------------------------//
 
 // 'PUT' REQUEST - UPDATE A COURSE
-app.put('/:id', (req, res) => {
+app.put('/api/courses/:id', (req, res) => {
     // Lookup the request
     // If not existing, return 404 - Not Found
     const course = courses.find(c => c.id === parseInt(req.params.id));
     if (!course) return res.status(404).send('The course with the given ID was not found.');
-
+    
     // Validate
-    const schema = {
-        name: Joi.string().min(3).required()
-    };
-    const result = Joi.validate(req.body, schema)
     // If invalid, return 400 - Bad Request
-    if (result.error) {
-        res.status(400).send(result.error.details[0].message)
+    // Using object restructuring { error } is the same as result.error
+    const { error } = validateCourse(req.body);
+    if (error) {
+        res.status(400).send(error.details[0].message)
         return;
     }
     
@@ -111,11 +97,13 @@ app.put('/:id', (req, res) => {
 // -----------------------------------------//
 
 // VALIDATION FUNCTION
+// Define a schema for shape of course objects
+// Create a validateCourse function for PUT
 function validateCourse(course) {
     const schema = {
-      name: Joi.string().min(3).required()
+        name: Joi.string().min(3).required()
     };
-  
+    
     return Joi.validate(course, schema);
 }
 // -----------------------------------------//
