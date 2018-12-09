@@ -1,2 +1,3 @@
 # To exclude the node_modules/ folder from GitHub:
 node_modules/
+genres/

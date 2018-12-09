@@ -23,14 +23,12 @@ const courses = [
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
-// -----------------------------------------//
 
 // 'GET' REQUEST - ALL
 // http://localhost:3000/api/courses
 app.get('/api/courses', (req, res) => {
     res.send(courses);
 });
-// -----------------------------------------//
 
 // 'GET' REQUEST - SINGLE COURSE
 // http://localhost:3000/api/courses/1
@@ -47,16 +45,12 @@ app.get('/api/courses/:id', (req, res) => {
 
     return res.send(course)
 });
-// -----------------------------------------//
 
 // 'POST' REQUEST - NEW COURSE
 // To post a new course into the object array
 app.post('/api/courses', (req, res) => {
     const { error } = validateCourse(req.body)
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return;
-    }
+    if (error) return res.status(400).send(error.details[0].message);
 
     // TO POST NEW COURSE ID & NAME
     const course = {
@@ -68,7 +62,6 @@ app.post('/api/courses', (req, res) => {
     courses.push(course);
     res.send(course);
 });
-// -----------------------------------------//
 
 // 'PUT' REQUEST - UPDATE A COURSE
 app.put('/api/courses/:id', (req, res) => {
@@ -81,20 +74,30 @@ app.put('/api/courses/:id', (req, res) => {
     // If invalid, return 400 - Bad Request
     // Using object restructuring { error } is the same as result.error
     const { error } = validateCourse(req.body);
-    if (error) {
-        res.status(400).send(error.details[0].message)
-        return;
-    }
+    if (error) return res.status(400).send(error.details[0].message);
     
     // Update the course
     course.name = req.body.name; 
     // Return the updated course array
     res.send(course);
 });
-// -----------------------------------------//
 
 // DELETE REQUEST - REMOVE A COURSE
-// -----------------------------------------//
+app.delete('/api/courses/:id', (req, res) => {
+    // Lookup the course with a given ID
+    // If not existing, return 404 - Not Found
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if (!course) return res.status(404).send('The course with the given ID was not found.');
+
+    // Delete the course
+    // Find the index of course in array
+    const index = courses.indexOf(course)
+    // then remove object from array - go to index, remove 1 object
+    courses.splice(index, 1)
+
+    // Return the same course
+    res.send(course);
+});
 
 // VALIDATION FUNCTION
 // Define a schema for shape of course objects
@@ -106,9 +109,7 @@ function validateCourse(course) {
     
     return Joi.validate(course, schema);
 }
-// -----------------------------------------//
 
 // PORT
 const port = process.env.PORT || 3000;
 app.listen(3000, () => console.log(`Listening on port ${port}...`));
-// -----------------------------------------//
