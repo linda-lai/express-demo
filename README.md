@@ -1,4 +1,11 @@
 # express-demo
+Notes and practice creating and testing API routes in Express.
+
+|[![Linda Lai](assets/contributors-linda-lai-70x70.jpg)](https://github.com/linda-lai) |
+|-----------|
+| Linda Lai |
+
+## Creating an API in Express
 Routing refers to how an application’s endpoints (URIs) respond to client requests. Route definition takes the following structure:
 
 ```
@@ -19,18 +26,66 @@ These routing methods specify a callback function (sometimes called “handler f
 * Routing: https://expressjs.com/en/guide/routing.html#response-methods
 *  Express/Node introduction: https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Introduction
 
+To create a new API, create a new directory and create a new `package.json` file:
+```
+$ mkdir api
+$ cd api
+$ npm init
+```
+
+Input API details (or use `npm init --yes` to skip:)
+```json
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "An API to serve Pokemon requests",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Linda Lai",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
+```
+
+To create a new API, install Express and Nodemon as dependencies:
+```
+$ npm install express --save
+$ npm install --save-dev nodemon
+```
+
+In `package.json`, add a script to run `api.js` file when `npm start` is called:
+
+```json
+{
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon api.js"
+  }
+}
+```
+
+Create a new file called `api.js` and require in a new instance of Express:
+
 ```js
 const express = require('express');
+
 const app = express();
+const port = process.env.PORT || 5000;
 
 app.get('/', function(req, res) {
   res.send('Hello World!');
 });
 
-app.listen(3000, () => console.log('Listening on port 3000...'))
+app.listen(port, () => {
+    console.log(`Listening at http://localhost:${port}`);
+});
 ```
 
-The first two lines require() (import) the express module and create an Express application. 
+The `express` and `app` variables require in the Express module and creates a new instance of the Express application, which is a function: `express()`. 
 
 This object, which is traditionally named app, has methods for routing HTTP requests, configuring middleware, rendering HTML views, registering a template engine, and modifying application settings that control how the application behaves (e.g. the environment mode, whether route definitions are case sensitive, etc.)
 
@@ -55,10 +110,16 @@ app.listen(3000, function() {
 });
 ```
 
+To run `api.js`:
+```
+$ npm start
+$ node api.js
+```
+
 ### Route Handlers
 The Express application object also provides methods to define route handlers for all the other HTTP verbs, which are mostly used in exactly the same way:
 
-```checkout(), copy(), **delete()**, **get()**, head(), lock(), merge(), mkactivity(), mkcol(), move(), m-search(), notify(), options(), patch(), **post()**, purge(), **put()**, report(), search(), subscribe(), trace(), unlock(), unsubscribe().```
+```checkout(), copy(), delete(), get(), head(), lock(), merge(), mkactivity(), mkcol(), move(), m-search(), notify(), options(), patch(), post(), purge(), put(), report(), search(), subscribe(), trace(), unlock(), unsubscribe().```
 
 There is a special routing method, `app.all()`, which will be called in response to any HTTP method. 
 
